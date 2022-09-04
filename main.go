@@ -9,12 +9,8 @@ import (
  
 func main() {
 	// Echo instance
-	e := echo.New()
-
-    //run nats along 
-    // natsServe()
-
-	// Middleware
+	e := echo.New() 
+ 
     nats.Serve()
     
 	e.Use(middleware.Logger())
