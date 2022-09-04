@@ -5,6 +5,7 @@ import (
     "codetunapubsub/nats"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"fmt"
 )
  
 func main() {
@@ -17,10 +18,12 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.GET("/", func(c echo.Context) error {
-     
+		fmt.Println("@ publish")
+		nats.Connect(nats.URLstr)
         nats.Pubs( []byte("{ 'data' : 'server has published  to nats '}}") )
 		return c.String(http.StatusOK, "Each request to this route will be forwarded to Nats server and processed by the Nats subscriber!\n")
 	})
+
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))

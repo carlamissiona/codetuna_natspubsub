@@ -9,7 +9,9 @@ import (
 )
 
 var nc *nats.Conn
+var ns server.Server
 var subject string  = "whatsmyurl"
+var URLstr = "server"
 
 func Serve() {
 	opts := &server.Options{}
@@ -23,40 +25,41 @@ func Serve() {
 	// Start the server via goroutine
 	go ns.Start()
 
-    
-	// Wait for server to be ready for connections
+     
 	if !ns.ReadyForConnections(4 * time.Second) {
 		panic("not ready for connection")
 	}
 
+	URLstr = ns.ClientURL()
     
-    connect(ns.ClientURL())
+    Connect(ns.ClientURL())
 	 
 	 
- Subs(subject)
+    Subs(subject)
  
 	// Wait for server shutdown
 	ns.WaitForShutdown()
 }
 
 func Pubs( str_pub []byte){
-     
+    fmt.Println("@ publish")
 	nc.Publish(subject,str_pub)
 
 }
-func Subs(subject string ){
-	 
-	nc.Subscribe(subject, func(msg *nats.Msg) {
+func Subs(topic string ){
+	fmt.Println("@ subs waiting") 
+	nc.Subscribe(topic, func(msg *nats.Msg) {
 		// Print message data
+		fmt.Println("@ subscribe nc")
 		data := string(msg.Data)
 		fmt.Println(data)
 
 		// Shutdown the server (optional)
 		// ns.Shutdown()
 	})
-    
+ 
 }
-func connect(nats_url string){
+func Connect(nats_url string){
     var err error
 	nc, err = nats.Connect(nats_url )
 
